@@ -36,7 +36,7 @@ int main(){
 
 void menuPrincipal(){
     int i = 0, n;
-    printf("---WORDLE---\nAUS - Taller de programación I \nBaiocchi Teo, Cerón Santiago");
+    printf("---WORDLE---\nAUS - Taller de programación I \nBaiocchi Teo, Ceron Santiago");
     printf("\n\n");
     printf("1) Jugar una partida\n");
     printf("2) salir\n");
