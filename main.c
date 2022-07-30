@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
+
 
 
 //Esta funcion simplemente limpia la consola, y detecta automaticamente el 
@@ -37,7 +39,7 @@ int main(){
 
 void menuPrincipal(){
     int i = 0, n, invalido = 0;
-    printf("---WORDLE---\nAUS - Taller de programación I \nBaiocchi Teo, Ceron Santiago");
+    printf("---WORDLE---\nAUS - Taller de programacion I \nBaiocchi Teo, Ceron Santiago");
     printf("\n\n");
     printf("1) Jugar una partida\n");
     printf("2) Reglas del juego\n");
@@ -54,6 +56,8 @@ void menuPrincipal(){
             case 1:
                 invalido = 0;
                 nuevaPartida();
+                limpiarPantalla();
+                menuPrincipal();
                 break;
             case 2:
                 invalido = 0;
@@ -82,63 +86,115 @@ void nuevaPartida(){
         printf("Ingrese una cantidad de partidas para jugar (No mayor a 8): ");
         scanf("%d", &j); 
         bufferEnter(); } while(j<1 || j>8);
-        
+        //char todosIntentos[j][26][3];
     for(i = 0; i < j; i++){
         jugada(i+1, j);
+        if(i+1 == j)
+        {
+            printf("Fin del juego...\n");
+            printf("Tu puntaje total fue de: \n");
+            printf("Si deseas revisar el mapa de una jugada de tus %i jugadas, en particular, ingresala. \nSino, ingresa 0 para salir del programa: ", j);
+            bufferEnter();
+        }
     }
 }
 
 void jugada(int actual, int total){
     char adivinar[6] = "GATOS"; //palabra de prueba, esto hay que hacer una funcion que traiga una aleatoria de un archivo despues
     char intento[6];
+     //Para guardar 
     int i, j, k, comprobante = 0;
-    for(i = 0; i < 5; i++){
+    
+    limpiarPantalla();
+    mensajeNroJugada(actual, total);
         
-        while(comprobante != 1){
-            limpiarPantalla();
-            mensajeNroJugada(actual, total);
-            if(i == 0){
+        
+    for(i = 0; i < 5; i++)
+    {
+
+        comprobante = 0;
+        while(comprobante != 1)
+        {
+
                 char aux[10]; //para testear el largo
-                printf("Ingrese su primer intento: ");
+                
+                printf("Ingrese su intento N°%i: ", i+1);
                 scanf("%s", aux);
                 bufferEnter();
-                if(strlen(aux) > 5){
+                
+                if(strlen(aux) > 5)
+                {
                     printf("Tu ingreso fue demasiado largo. Recorda que son palabras de 5 caracteres.\n");
+                    printf("Presione enter para continuar...");
+                    bufferEnter();
                 } else {
-                    if (strlen(aux) < 5) {
+                    if (strlen(aux) < 5) 
+                    {
                     printf("Tu ingreso fue demasiado corto. Recorda que son palabras de 5 caracteres.\n");
                     printf("Presione enter para continuar...");
                     bufferEnter();
                     } else {    
                         strcpy(intento, aux);
                         comprobante = 1;
-                     }
+                    }
                 } 
-            } 
         }
         
+        
+        //Normaliza la palabra a mayuscula
+        j = 0;
+        while(intento[j])
+        {
+            intento[j] = toupper(intento[j]);
+            j++;
+        }
+    
+        
+        //Si la palabra y el ingreso son iguales, ganaste!
+        //Break para salir del for de los 5 intentos de ingresar palabra y cortar las otras verificaciones
+        if (strcmp(intento, adivinar) == 0)
+        {
+            verde();
+            printf("Adivinaste la palabra!\n");
+            colorReset();
+            break;
+        }
+        
+        
+        
         //Aca el ingreso ya es valido y guardado en intento
-        comprobante = 0;
-        for(j = 0; j < 5; j++){
-            
-            if(adivinar[j] == intento[j]){
-                printf("El caracter %c esta en la posicion correcta. \n", intento[j]);
+        //Se revisa en las 5 letras del intento si esta bien puesta, 
+        //o si esta en cualquier otro lado de la palabra (con un for anidado)
+        for(j = 0; j < 5; j++)
+        { 
+            comprobante = 0;
+            if(adivinar[j] == intento[j])
+            {
+                verde();
+                printf("%c", intento[j]);
             } else {
-                for(k = 0; k < 5 ; k++){
-                    
-                    if(adivinar[k] == intento[j]){
-                        printf("El caracter %c esta en la palabra, pero en otra posicion. \n", intento[j]);
+                for(k = 0; k < 5 ; k++)
+                {
+                    if(adivinar[k] == intento[j])
+                    {
+                        negro();
+                        printf("%c", intento[j]);
+                        k=6; //Para cortar antes este for si se diere el caso
                     } else comprobante++;
-                    
                 }
-                
-                printf("comprobante: %i \n", comprobante);
-                if(comprobante == 4){
-                    printf("El caracter %c no estaba en la palabra.", intento[j]);
+                if(comprobante == 5)
+                {   
+                    rojo();
+                    printf("%c", intento[j]);
                 }
             }
         }
+        printf("\n");
+        colorReset();
     }
+    
+    printf("Presione enter para continuar. ");
+    bufferEnter();
 }
 
 
@@ -163,9 +219,11 @@ void getWordInLine(char *fileName, int lineNumber, char *p) {
     }
 }
 
+
 void mensajeNroJugada(int actual, int total){
-    printf("Esta es tu jugada %i de %i \n-----\n", actual, total);
+    printf("Esta es tu jugada %i de %i \nRecorda que Verde = Lugar correcto, Gris = Lugar incorrecto, Rojo = Letra incorrecta \n-----\n", actual, total);
 }
+
 void verde(){
     printf("\033[0;32m");
 }
