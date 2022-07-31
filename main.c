@@ -3,8 +3,6 @@
 #include <string.h>
 #include <ctype.h>
 
-
-
 //Esta funcion simplemente limpia la consola, y detecta automaticamente el
 //sistema operativo para cambiar el llamado al sistema que lo hace (multiplataforma)
 void limpiarPantalla();
@@ -30,6 +28,9 @@ void blanco();
 void negro();
 void colorReset();
 
+
+
+
 int main(){
     menuPrincipal();
     printf("Saliste del juego. Presione enter para terminar el programa...");
@@ -43,7 +44,7 @@ void menuPrincipal(){
     printf("\n\n");
     printf("1) Jugar una partida\n");
     printf("2) Reglas del juego\n");
-    printf("3) salir\n");
+    printf("3) Salir\n");
     char ingreso[6];
     while(i != (-1)){
         if(invalido == 1){
@@ -75,43 +76,49 @@ void menuPrincipal(){
                 menuPrincipal();
                 break;
         }
-
     }
 }
 
 void nuevaPartida(){
-    int i, j;
+    int i, j, j2, salir = 0, n;
     do{
         limpiarPantalla();
-        printf("Ingrese una cantidad de partidas para jugar (No mayor a 8): ");
+        printf("Ingrese cuantas palabras para adivinar en esta partida (No mayor a 8): ");
         scanf("%d", &j);
         bufferEnter(); } while(j<1 || j>8);
-    for(i = 0; i < j; i++){
+        j2 = j;
         
-        if(i != 0 && i != j-1)
+    for(i = 0; i <= j; i++)
+    {
+        if(i != 0 && i != j)
         {
-            int n;
             printf("Terminaste tu partida %i de %i, para terminar el juego ahora ingrese 0\nPara continuar, ingrese cualquier otra tecla: ", i, j);
             scanf("%d", &n);
             bufferEnter();
             if(n == 0)
             {
-                i = j-1;
+                j2 = i; //Si se corta la partida antes de tiempo, en J2 se guarda cuantas jugadas se jugaron efectivamente
+                salir = 1;
             }
         }
         
-        jugada(i+1, j);
-        if(i+1 == j)
+        // esto no anda bien
+        if(salir == 1 || i == j) //Cuando la partida termina, ya sea por que termino o porque fue cortada  
         {
+            limpiarPantalla();
             printf("Fin del juego...\n");
-            printf("Tu puntaje total fue de: \n");
-            printf("Si deseas revisar el mapa de una jugada de tus %i jugadas, en particular, ingresala. \nSino, ingresa 0 para salir del programa: ", j);
+            printf("El promedio de tus puntajes fue de: \n");
+            printf("Si deseas revisar el mapa o puntaje de una jugada especifica de tus %i jugadas, ingresala. \nCaso contrario, ingresa 0 para volver al menu: ", j2);
+            scanf("%d", &n);
             bufferEnter();
+        } else {
+            jugada(i+1, j);
         }
     }
 }
 
 void jugada(int actual, int total){
+    
     char adivinar[6] = "GATOS"; //palabra de prueba, esto hay que hacer una funcion que traiga una aleatoria de un archivo despues
     char intento[6];
     int i, j, k, l, comprobante = 0, puntaje = 5000;
@@ -121,7 +128,8 @@ void jugada(int actual, int total){
     // valor "0", no fue encontrada. "1", fue adivinada pero en el lugar incorrecto, "2", letra ya validad en su posicion
     int punt[5] = {0, 0, 0, 0, 0};
     
-
+    char palabras[7][6]={{'\0'}, {'\0'}, {'\0'}, {'\0'}, {'\0'}, {'\0'}};
+    
     limpiarPantalla();
     mensajeNroJugada(actual, total);
 
@@ -173,6 +181,13 @@ void jugada(int actual, int total){
             intento[j] = toupper(intento[j]);
             j++;
         }
+        
+        //guardar los intentos para mostrarlos al final de la sesion
+        for(k=0; k<5; k++)
+        {
+            palabras[i][k]=intento[k];
+        }
+        palabras[i][6] = '\0';
 
 
         //Si la palabra y el ingreso son iguales, ganaste!
@@ -202,7 +217,6 @@ void jugada(int actual, int total){
         {
             comprobante = 0;
 
-            
             if(adivinar[j] == intento[j])
             { //letra correcta en lugar correcto
                 verde();
@@ -240,6 +254,16 @@ void jugada(int actual, int total){
 
         colorReset();
     } //aca termina el for de cada intento
+    /*muestro las palabras usadas en cada intento de la ultima jugada
+      printf("Intentos realizados en la ultima jugada: \n");
+      for(i=0; i<5; i++)
+        {
+            for(k=0; k<6; k++)
+            {
+                printf("%c", palabras[i][k]);
+            }
+            printf("\n");
+        }*/
 }
 
 
