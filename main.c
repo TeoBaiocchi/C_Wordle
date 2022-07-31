@@ -103,7 +103,7 @@ void nuevaPartida(){
         }
         
         // esto no anda bien
-        if(salir == 1 || i == j) //Cuando la partida termina, ya sea por que termino o porque fue cortada  
+        if(i == j || salir == 1) //Cuando la partida termina, ya sea por que termino o porque fue cortada  
         {
             limpiarPantalla();
             printf("Fin del juego...\n");
