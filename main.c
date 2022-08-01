@@ -17,7 +17,7 @@ void bufferEnter();
 //Las secciones del programa estan moduladas para un armado más sencillo
 void menuPrincipal();
 void nuevaPartida();
-void jugada(int actual, int total);
+int jugada(int actual, int total, char todosIntentos[][7][6]);
 void mensajeNroJugada(int actual, int total);
 
 //Estas funciones setean el color del que va a salir el output. Útil para el diagrama y utilidades varias
@@ -79,7 +79,8 @@ void menuPrincipal(){
 }
 
 void nuevaPartida(){
-    int i, j, j2, salir = 0, n;
+    int i, j, j2, salir = 0, n, todosPuntajes[8];
+    char todosIntentos[9][7][6]; //Uno extra para el terminador, por las dudas
     do{
         limpiarPantalla();
         printf("Ingrese cuantas palabras para adivinar en esta partida (No mayor a 8): ");
@@ -114,12 +115,12 @@ void nuevaPartida(){
             scanf("%d", &n);
             bufferEnter();
         } else {
-            jugada(i+1, j);
+            todosPuntajes[i] = jugada(i, j, todosIntentos);
         }
     }
 }
 
-void jugada(int actual, int total){
+int jugada(int actual, int total, char palabras[][7][6]){
     char wordle[6] = "GATOS"; //palabra de prueba, esto hay que hacer una funcion que traiga una aleatoria de un archivo despues
     char intento[6];
     int i, j, k, l, comprobante = 0, puntaje = 5000;
@@ -129,10 +130,8 @@ void jugada(int actual, int total){
     // valor "0", no fue encontrada. "1", fue adivinada pero en el lugar incorrecto, "2", letra ya validad en su posicion
     int punt[5] = {0, 0, 0, 0, 0};
 
-    char palabras[7][6]={{'\0'}, {'\0'}, {'\0'}, {'\0'}, {'\0'}, {'\0'}};
-
     limpiarPantalla();
-    mensajeNroJugada(actual, total);
+    mensajeNroJugada(actual+1, total);
 
     for(i = 0; i < 6; i++)
     {
@@ -150,21 +149,19 @@ void jugada(int actual, int total){
 
                 char aux[10]; //para testear el largo
 
-                printf("Ingrese su intento N°%i: ", i+1);
+                printf("Ingrese su intento Nro %i: ", i+1);
                 scanf("%s", aux);
                 bufferEnter();
 
                 if(strlen(aux) > 5)
                 {
                     printf("Tu ingreso fue demasiado largo. Recorda que son palabras de 5 caracteres.\n");
-                    printf("Presione enter para continuar...");
-                    bufferEnter();
+
                 } else {
                     if (strlen(aux) < 5)
                     {
                     printf("Tu ingreso fue demasiado corto. Recorda que son palabras de 5 caracteres.\n");
-                    printf("Presione enter para continuar...");
-                    bufferEnter();
+
                     } else {
                         strcpy(intento, aux);
                         comprobante = 1;
@@ -184,9 +181,9 @@ void jugada(int actual, int total){
         //guardar los intentos para mostrarlos al final de la sesion
         for(k=0; k<5; k++)
         {
-            palabras[i][k]=intento[k];
+            palabras[actual][i][k]=intento[k];
         }
-        palabras[i][6] = '\0';
+        palabras[actual][i][6] = '\0';
 
 
         //Si la palabra y el ingreso son iguales, ganaste!
@@ -252,18 +249,7 @@ void jugada(int actual, int total){
         }
         colorReset();
     }
-
-    //aca termina el for de cada intento
-    /*muestro las palabras usadas en cada intento de la ultima jugada
-      printf("Intentos realizados en la ultima jugada: \n");
-      for(i=0; i<5; i++)
-        {
-            for(k=0; k<6; k++)
-            {
-                printf("%c", palabras[i][k]);
-            }
-            printf("\n");
-        }*/
+    return puntaje;
 }
 
 
