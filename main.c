@@ -30,7 +30,6 @@ void colorReset();
 
 
 
-
 int main(){
     menuPrincipal();
     printf("Saliste del juego. Presione enter para terminar el programa...");
@@ -85,12 +84,12 @@ void nuevaPartida(){
         limpiarPantalla();
         printf("Ingrese cuantas palabras para adivinar en esta partida (No mayor a 8): ");
         scanf("%d", &j);
-        bufferEnter(); } while(j<1 || j>8);
+        bufferEnter();} while(j<1 || j>8);
         j2 = j;
-        
+
     for(i = 0; i <= j; i++)
     {
-        if(i != 0 && i != j)
+        if(i != 0  && i != j)
         {
             printf("Terminaste tu partida %i de %i, para terminar el juego ahora ingrese 0\nPara continuar, ingrese cualquier otra tecla: ", i, j);
             scanf("%d", &n);
@@ -101,10 +100,13 @@ void nuevaPartida(){
                 salir = 1;
             }
         }
-        
-        // esto no anda bien
-        if(i == j || salir == 1) //Cuando la partida termina, ya sea por que termino o porque fue cortada  
+
+
+
+        if(i == j || salir == 1) //Cuando la partida termina, ya sea por que termino o porque fue cortada
         {
+            printf("Presione enter para continuar.\n");
+            bufferEnter();
             limpiarPantalla();
             printf("Fin del juego...\n");
             printf("El promedio de tus puntajes fue de: \n");
@@ -118,34 +120,31 @@ void nuevaPartida(){
 }
 
 void jugada(int actual, int total){
-    
-    char adivinar[6] = "GATOS"; //palabra de prueba, esto hay que hacer una funcion que traiga una aleatoria de un archivo despues
+    char wordle[6] = "GATOS"; //palabra de prueba, esto hay que hacer una funcion que traiga una aleatoria de un archivo despues
     char intento[6];
     int i, j, k, l, comprobante = 0, puntaje = 5000;
-    
+
     //array de verificacion de "estado de la letra" para asignar puntaje
     //5 espacios, uno por cada letra a adivinar
     // valor "0", no fue encontrada. "1", fue adivinada pero en el lugar incorrecto, "2", letra ya validad en su posicion
     int punt[5] = {0, 0, 0, 0, 0};
-    
+
     char palabras[7][6]={{'\0'}, {'\0'}, {'\0'}, {'\0'}, {'\0'}, {'\0'}};
-    
+
     limpiarPantalla();
     mensajeNroJugada(actual, total);
 
-
     for(i = 0; i < 6; i++)
     {
-        
         if(i>0)
-        { 
+        {
             //Restar 500 puntos cada vez que se hace un nuevo intento, excepto en el primer intento
             puntaje = puntaje - 500;
         }
         printf("\nTu puntaje es de %d puntos\n", puntaje);
-        
+
         comprobante = 0;
-        
+
         while(comprobante != 1)
         {
 
@@ -169,19 +168,19 @@ void jugada(int actual, int total){
                     } else {
                         strcpy(intento, aux);
                         comprobante = 1;
-                    }
                 }
+            }
         }
 
 
-       
+
         j = 0;  //Normaliza la palabra a mayuscula
         while(intento[j])
         {
             intento[j] = toupper(intento[j]);
             j++;
         }
-        
+
         //guardar los intentos para mostrarlos al final de la sesion
         for(k=0; k<5; k++)
         {
@@ -192,7 +191,7 @@ void jugada(int actual, int total){
 
         //Si la palabra y el ingreso son iguales, ganaste!
         //Break para salir del for de los 5 intentos de ingresar palabra y cortar las otras verificaciones
-        if (strcmp(intento, adivinar) == 0)
+        if (strcmp(intento, wordle) == 0)
         {
             if(i == 0)
             {
@@ -217,7 +216,7 @@ void jugada(int actual, int total){
         {
             comprobante = 0;
 
-            if(adivinar[j] == intento[j])
+            if(wordle[j] == intento[j])
             { //letra correcta en lugar correcto
                 verde();
                 printf("%c", intento[j]);
@@ -230,20 +229,20 @@ void jugada(int actual, int total){
             } else {
                 for(k = 0; k < 5 ; k++)
                 {   //letra correcta en lugar incorrecto
-                    if(adivinar[k] == intento[j])
+                    if(wordle[k] == intento[j])
                     {
                         negro();
                         printf("%c", intento[j]);
-                        
-                        if(punt[k] == 0) 
-                        {  
+
+                        if(punt[k] == 0)
+                        {
                             puntaje = puntaje + 50;
                             punt[k] = 1;
                         }
                         k = 6; //Para cortar antes este for si se diere el caso
                     } else comprobante++;
                 }
-                
+
                 if(comprobante == 5)
                 { //la letra no esta en la palabra
                     rojo();
@@ -251,9 +250,10 @@ void jugada(int actual, int total){
                 }
             }
         }
-
         colorReset();
-    } //aca termina el for de cada intento
+    }
+
+    //aca termina el for de cada intento
     /*muestro las palabras usadas en cada intento de la ultima jugada
       printf("Intentos realizados en la ultima jugada: \n");
       for(i=0; i<5; i++)
