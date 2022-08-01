@@ -123,7 +123,7 @@ void nuevaPartida(){
 int jugada(int actual, int total, char palabras[][7][6]){
     char wordle[6] = "GATOS"; //palabra de prueba, esto hay que hacer una funcion que traiga una aleatoria de un archivo despues
     char intento[6];
-    int i, j, k, l, comprobante = 0, puntaje = 5000;
+    int i, j, k, l, comprobante = 0, puntaje = 5000, derrota=0;
 
     //array de verificacion de "estado de la letra" para asignar puntaje
     //5 espacios, uno por cada letra a adivinar
@@ -202,11 +202,12 @@ int jugada(int actual, int total, char palabras[][7][6]){
             printf("Tu puntaje final es de %d puntos.\n", puntaje);
             colorReset();
             break;
+        } else
+        {
+            derrota++;
         }
 
-
-
-        //Aca el ingreso ya es valido y guardado en intento
+               //Aca el ingreso ya es valido y guardado en intento
         //Se revisa en las 5 letras del intento si esta bien puesta,
         //o si esta en cualquier otro lado de la palabra (con un for anidado)
         for(j = 0; j < 5; j++)
@@ -248,7 +249,19 @@ int jugada(int actual, int total, char palabras[][7][6]){
             }
         }
         colorReset();
+
+        if(derrota==6){
+            
+            puntaje=0;
+            printf("\n\n¡Perdiste! Te quedaste sin intentos para adivinar la palabra\n");
+            printf("Tu puntaje final es: %d puntos\n", puntaje);
+            printf("El Wordle era: ");
+            verde();
+            printf("%s\n\n", wordle);
+            colorReset();
+        }
     }
+    
     return puntaje;
 }
 
