@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <time.h>
+
+#define CANTIDAD_PALABRAS 30
 
 //Esta funcion simplemente limpia la consola, y detecta automaticamente el
 //sistema operativo para cambiar el llamado al sistema que lo hace (multiplataforma)
@@ -18,6 +21,7 @@ void bufferEnter();
 void menuPrincipal();
 void nuevaPartida();
 int jugada(int actual, int total, char todosIntentos[][7][6]);
+void wordleRandomizer(char wordle[]);
 void mensajeNroJugada(int actual, int total);
 
 //Estas funciones setean el color del que va a salir el output. Útil para el diagrama y utilidades varias
@@ -79,14 +83,18 @@ void menuPrincipal(){
 }
 
 void nuevaPartida(){
-    int i, j, j2, salir = 0, n, todosPuntajes[8];
+    int i, j, k, j2, salir = 0, n, max = 0, min = 10001, imax = 0, imin = 0;
+    int todosPuntajes[8] = {-1, -1, -1, -1, -1, -1, -1, -1};
     char todosIntentos[9][7][6]; //Uno extra para el terminador, por las dudas
+
     do{
         limpiarPantalla();
         printf("Ingrese cuantas palabras para adivinar en esta partida (No mayor a 8): ");
         scanf("%d", &j);
         bufferEnter();} while(j<1 || j>8);
-        j2 = j;
+
+    j2 = j;
+
 
     for(i = 0; i <= j; i++)
     {
@@ -110,10 +118,32 @@ void nuevaPartida(){
             bufferEnter();
             limpiarPantalla();
             printf("Fin del juego...\n");
+
+            //puntaje maximo
+            for(k=0; k<8; k++){
+                if(todosPuntajes[k] > max && todosPuntajes[k] != -1){
+                    max = todosPuntajes[k];
+                    imax = k + 1;
+                }
+            }
+
+
+            //puntaje minimo
+            for(k=0; k<8; k++){
+                if(todosPuntajes[k] < min && todosPuntajes[k] != -1){
+                    min = todosPuntajes[k];
+                    imin = k + 1;
+                }
+            }
+        
+            printf("Tu puntaje maximo fue de %d puntos y lo obtuviste en la partida %d\n", max, imax);
+            printf("Tu puntaje minimo fue de %d puntos y lo obtuviste en la partida %d\n", min, imin);
             printf("El promedio de tus puntajes fue de: \n");
             printf("Si deseas revisar el mapa o puntaje de una jugada especifica de tus %i jugadas, ingresala. \nCaso contrario, ingresa 0 para volver al menu: ", j2);
             scanf("%d", &n);
             bufferEnter();
+            if(n == 0)
+                break;
         } else {
             todosPuntajes[i] = jugada(i, j, todosIntentos);
         }
@@ -121,7 +151,8 @@ void nuevaPartida(){
 }
 
 int jugada(int actual, int total, char palabras[][7][6]){
-    char wordle[6] = "GATOS"; //palabra de prueba, esto hay que hacer una funcion que traiga una aleatoria de un archivo despues
+
+    char wordle[6];
     char intento[6];
     int i, j, k, l, comprobante = 0, puntaje = 5000, derrota=0;
 
@@ -132,6 +163,7 @@ int jugada(int actual, int total, char palabras[][7][6]){
 
     limpiarPantalla();
     mensajeNroJugada(actual+1, total);
+    wordleRandomizer(wordle);
 
     for(i = 0; i < 6; i++)
     {
@@ -148,7 +180,6 @@ int jugada(int actual, int total, char palabras[][7][6]){
         {
 
                 char aux[10]; //para testear el largo
-
                 printf("Ingrese su intento Nro %i: ", i+1);
                 scanf("%s", aux);
                 bufferEnter();
@@ -249,22 +280,38 @@ int jugada(int actual, int total, char palabras[][7][6]){
             }
         }
         colorReset();
-
-        if(derrota==6){
-            
+        if(derrota == 6){
             puntaje=0;
-            printf("\n\n¡Perdiste! Te quedaste sin intentos para adivinar la palabra\n");
+            printf("\n\nPerdiste! Te quedaste sin intentos para adivinar la palabra\n");
             printf("Tu puntaje final es: %d puntos\n", puntaje);
             printf("El Wordle era: ");
             verde();
-            printf("%s\n\n", wordle);
+            printf("%s\n", wordle);
             colorReset();
         }
     }
-    
+
     return puntaje;
 }
 
+void wordleRandomizer(char wordle[]){
+    //Se randomiza la semilla
+    srand(time(NULL));
+
+    //n = entero entre 0 y 30, la cantidad de palabras definida en el archivo dado
+    int n = (rand() % CANTIDAD_PALABRAS);
+
+    //Multiplataforma, por la cuestion de la barra en el path
+  #if defined(linux) || defined(unix) || defined(APPLE)
+    getWordInLine("/palabras.txt", n, wordle);
+  #endif
+
+  #if defined(_WIN32) || defined(_WIN64)
+    getWordInLine("\palabras.txt", n, wordle);
+  #endif
+
+  wordle[5] = '\0';
+}
 
 void getWordInLine(char *fileName, int lineNumber, char *p) {
     FILE * fp;
