@@ -6,20 +6,7 @@
 
 #define CANTIDAD_PALABRAS 30
 
-//funcion dada en comunidades para acceder a un archivo
-//La usamos con un path relativo, "palabras.txt" *tiene que* estar
-//en la misma carpeta que "main.c"
-void getWordInLine(char *fileName, int lineNumber, char *p);
 
-//Esta funcion simplemente limpia la consola, y detecta automaticamente el
-//sistema operativo para cambiar el llamado al sistema que lo hace (multiplataforma)
-void limpiarPantalla();
-
-//Esta funcion limpia el buffer luego de cada ingreso
-//Ya que queda a la espera de que presiones enter
-//Hace las veces de fflush, en cierta forma
-//Y además, puede usarse como "Presione enter para continuar"
-void bufferEnter();
 
 //Las secciones del programa estan moduladas para un armado más sencillo
 void menuPrincipal();
@@ -37,6 +24,21 @@ void blanco();
 void negro();
 void colorReset();
 
+//Esta funcion simplemente limpia la consola, y detecta automaticamente el
+//sistema operativo para cambiar el llamado al sistema que lo hace (multiplataforma)
+void limpiarPantalla();
+
+//Esta funcion limpia el buffer luego de cada ingreso
+//Ya que queda a la espera de que presiones enter
+//Hace las veces de fflush, en cierta forma
+//Y además, puede usarse como "Presione enter para continuar"
+void bufferEnter();
+
+//funcion dada en comunidades para acceder a un archivo
+//La usamos con un path relativo, "palabras.txt" *tiene que* estar
+//en la misma carpeta que "main.c"
+void getWordInLine(char *fileName, int lineNumber, char *p);
+
 
 int main(){
     menuPrincipal();
@@ -44,6 +46,8 @@ int main(){
     bufferEnter();
     return 0;
 }
+
+
 
 void menuPrincipal(){
 
@@ -56,30 +60,53 @@ void menuPrincipal(){
     printf("3) Salir\n");
     char ingreso[6];
 
-    while(i != (-1)){
-        if(invalido == 1){
+    while(i != (-1)) //Nota: Por qué esto es i? Cambiar por algo tipo while true
+    {   
+        if(invalido == 1)
+        {
             printf("El numero ingresado no fue valido. Intente nuevamente... \n");
         }
+  
         printf("Ingrese un numero para seleccionar: ");
         scanf("%d", &n);
         bufferEnter();
-        switch(n){
+ 
+        switch(n)
+        {
             case 1:
                 invalido = 0;
                 nuevaPartida();
                 limpiarPantalla();
                 menuPrincipal();
                 break;
+                
             case 2:
                 invalido = 0;
-                printf("Aca irian las reglas. Hay que acordarse de escribirlas. \n");
-                printf("Presione Enter para continuar");
+                verde(); printf("Wordle!"); amarillo(); printf("El juego de adivinar una palabra sin ninguna pista en solo 6 intentos!\n");
+                colorReset(); printf("-----\n");
+                printf("El juego consiste en el ingreso de palabras de 5 caracteres, después de cada ingreso\n");
+                printf("se te indicara con colores que letras dentro de tu ingreso correspondian de cierta manera con una palabra misteriosa");
+                negro(); printf("(el wordle!)\n"); colorReset();
+                verde(); printf("Verde indica que la letra esta en la posición correcta\n"); 
+                colorReset(); printf("Estas letras bien adivinadas sumarán 100 puntos por unica vez cuando acertadas.\n");
+                amarillo(); printf("Amarillo indica que la letra es parte de la palabra misteriosa, pero no en esa posicion\n");
+                colorReset(); printf("Estas letras sumaran 50 puntos por unica vez cuando acertadas\n");
+                negro(); printf("Gris indica que la letra es completamente desacertada. Ningun punto para vos.\n");
+                colorReset();
+                rojo();
+                printf("\nEntendiste?\n");
+                negro(); printf("(Ingresa tu respuesta): ");
+                rojo();
                 bufferEnter();
                 limpiarPantalla();
+                printf("Barbaro. Suerte!");
+                colorReset();
                 menuPrincipal();
+                
             case 3:
                 return;
                 break;
+                
             default:
                 limpiarPantalla();
                 invalido = 1;
@@ -89,13 +116,26 @@ void menuPrincipal(){
     }
 }
 
-void nuevaPartida(){
-    int i, j, k, j2, salir = 0, n, max = 0, min = 10001, imax = 0, imin = 0, p = 0;
-    int todosPuntajes[8] = {-1, -1, -1, -1, -1, -1, -1, -1};
-    float sum=0, prom=0;
-    char todosIntentos[9][7][6]; //Uno extra para el terminador, por las dudas
-    char todosWordles[9][1][6]; //todos los wordle de cada jugada
 
+
+void nuevaPartida(){
+    
+    int i, j, k, j2, salir = 0, n, max = 0, min = 10001, imax = 0, imin = 0, p = 0;
+    
+    
+    int todosPuntajes[8] = {-1, -1, -1, -1, -1, -1, -1, -1};
+    //Todos puntajes tiene lugar para guardar los puntajes de las 8 partidas
+    //Si es que se fueran a jugar las 8. Es inicializado en -1 para poder tener control
+    //de cuantas se jugaron, a fin de poder calcular los minimos, maximos y promedio.
+    
+    float sum=0, prom=0;
+    
+    char todosIntentos[9][7][6];
+    char todosWordles[9][1][6]; 
+    //Estos arrays van a contener los strings de los intentos y las palabras magicas de todas las partidas que se jueguen
+    //La primera dimensión corresponde al numero de jugada, la segunda a una palabra, y la tercera a los caracteres individuales
+
+ 
     do{
         limpiarPantalla();
         printf("Ingrese cuantas palabras para adivinar en esta partida (No mayor a 8): ");
@@ -107,9 +147,9 @@ void nuevaPartida(){
 
     for(i = 0; i <= j; i++)
     {
-        if(i != 0  && i != j)
-        {
-            printf("Terminaste tu partida %i de %i, para terminar el juego ahora ingrese 0\nPara continuar, ingrese cualquier otra tecla: ", i, j);
+        if(i != 0  && i != j) 
+        {   //No se muestra la opcion para salir ni en la primera ni en la ultima ronda
+            printf("Terminaste tu partida %i de %i, si desea terminar el juego ahora mismo ingrese 0\nPara continuar, ingrese cualquier otra cosa y presione enter: ", i, j);
             scanf("%d", &n);
             bufferEnter();
             if(n == 0)
@@ -121,16 +161,19 @@ void nuevaPartida(){
 
 
 
-        if(i == j || salir == 1) //Cuando la partida termina, ya sea por que termino o porque fue cortada
-        {
+        if(i == j || salir == 1) 
+        {   //Cuando la partida termina, ya sea por que termino o porque fue cortada
             printf("Presione enter para continuar.\n");
             bufferEnter();
             limpiarPantalla();
+            negro();
             printf("Fin del juego...\n");
-
+            
             //puntaje maximo
-            for(k=0; k<8; k++){
-                if(todosPuntajes[k] > max && todosPuntajes[k] != -1){
+            for(k=0; k<8; k++)
+            {
+                if(todosPuntajes[k] > max && todosPuntajes[k] != -1)
+                {
                     max = todosPuntajes[k];
                     imax = k + 1;
                 }
@@ -138,26 +181,36 @@ void nuevaPartida(){
 
 
             //puntaje minimo
-            for(k=0; k<8; k++){
-                if(todosPuntajes[k] < min && todosPuntajes[k] != -1){
+            for(k=0; k<8; k++)
+            {
+                if(todosPuntajes[k] < min && todosPuntajes[k] != -1)
+                {
                     min = todosPuntajes[k];
                     imin = k + 1;
                 }
             }
 
             //promedio
-            for(k=0; k<8; k++){
-                if(todosPuntajes[k] != 0 && todosPuntajes[k] != -1){
+            for(k=0; k<8; k++)
+            {
+                if(todosPuntajes[k] != 0 && todosPuntajes[k] != -1)
+                {
                     sum = sum + todosPuntajes[k];
                     p++;
                 }
             }
-            prom=sum/p;
-
+            
+            prom = sum / p;
+            
+            verde();
             printf("Tu puntaje maximo fue de %d puntos y lo obtuviste en la partida %d\n", max, imax);
+            rojo();
             printf("Tu puntaje minimo fue de %d puntos y lo obtuviste en la partida %d\n", min, imin);
+            amarillo();
             printf("El promedio de los puntajes en que lograste una victoria fue de: %.2f puntos\n", prom);
+            negro();
             printf("Si deseas revisar el mapa o puntaje de una jugada especifica de tus %i jugadas, ingresala. \nCaso contrario, ingresa 0 para volver al menu: ", j2);
+            colorReset();
             scanf("%d", &n);
             bufferEnter();
 
@@ -167,32 +220,43 @@ void nuevaPartida(){
             }
 
             n = n-1;
-            if(n<j2 && n>=0){
+            if(n<j2 && n>=0)
+            {
                 mostrarJugada(todosIntentos, todosWordles, n, todosPuntajes[n]);
             }
         } else {
             todosPuntajes[i] = jugada(i, j, todosIntentos, todosWordles);
+            //Todo este if enorme revisa si la partida termino, entonces,
+            //si *no* termino, se efectua la jugada. La jugada recibe los array
+            //para almacenar los string pertinentes
+            //y devuelve el puntaje de la ronda.
         }
     }
 }
+
+
+
 
 int jugada(int actual, int total, char palabras[][7][6], char todosWordles[][1][6]){
 
     char wordle[6];
     char intento[6];
-    int i, j, k, l, comprobante = 0, puntaje = 5000, derrota=0;
+    int i, j, k, l, comprobante = 0, puntaje = 5000, derrota = 0;
 
-    //array de verificacion de "estado de la letra" para asignar puntaje
-    //5 espacios, uno por cada letra a adivinar
-    // valor "0", no fue encontrada. "1", fue adivinada pero en el lugar incorrecto, "2", letra ya validad en su posicion
+
     int punt[5] = {0, 0, 0, 0, 0};
+    //array de verificacion de "estado de la letra" para asignar puntajes
+    //5 espacios, uno por cada letra a adivinar. Funciona por posición
+    // valor "0", no fue encontrada. "1", fue adivinada pero en el lugar incorrecto, "2", letra ya validad en su posicion
 
     limpiarPantalla();
-    mensajeNroJugada(actual+1, total);
-    wordleRandomizer(wordle);
+    mensajeNroJugada(actual + 1, total); //Muestra el numero de la jugada
+    wordleRandomizer(wordle); //Toma una palabra aleatoria del archivo palabras.txt
 
-    for(i = 0; i < 6; i++){
+    for(i = 0; i < 6; i++)
+    {
         todosWordles[actual][0][i] = wordle[i];
+        //Guardamos el wordle de la ronda en el registro para utilizar mas tarde
     }
 
     for(i = 0; i < 6; i++)
@@ -203,12 +267,9 @@ int jugada(int actual, int total, char palabras[][7][6], char todosWordles[][1][
             puntaje = puntaje - 500;
         }
         printf("\nTu puntaje es de %d puntos\n", puntaje);
-
         comprobante = 0;
-
         while(comprobante != 1)
         {
-
                 char aux[10]; //para testear el largo
                 printf("Ingrese su intento Nro %i: ", i+1);
                 scanf("%s", aux);
@@ -217,19 +278,16 @@ int jugada(int actual, int total, char palabras[][7][6], char todosWordles[][1][
                 if(strlen(aux) > 5)
                 {
                     printf("Tu ingreso fue demasiado largo. Recorda que son palabras de 5 caracteres.\n");
-
                 } else {
                     if (strlen(aux) < 5)
                     {
                     printf("Tu ingreso fue demasiado corto. Recorda que son palabras de 5 caracteres.\n");
-
                     } else {
                         strcpy(intento, aux);
                         comprobante = 1;
                 }
             }
         }
-
 
         j = 0;  //Normaliza la palabra a mayuscula
         while(intento[j])
@@ -238,21 +296,23 @@ int jugada(int actual, int total, char palabras[][7][6], char todosWordles[][1][
             j++;
         }
 
-        //guardar los intentos para mostrarlos al final de la sesion
+        
         for(k=0; k<5; k++)
         {
             palabras[actual][i][k]=intento[k];
+            //Símil que "todosWordles". Guardamos los intentos de la sesion para uso posterior
         }
         palabras[actual][i][6] = '\0';
 
 
-        //Si la palabra y el ingreso son iguales, ganaste!
-        //Break para salir del for de los 5 intentos de ingresar palabra y cortar las otras verificaciones
+
         if (strcmp(intento, wordle) == 0)
         {
+           //Si la palabra y el ingreso son iguales, ganaste!
+           //Break para salir del for de los 5 intentos de ingresar palabra y cortar las otras verificaciones
             if(i == 0)
             {
-                puntaje = puntaje + 5000;
+                puntaje = puntaje + 5000; //Primer intento
             } else
             {
                 puntaje = puntaje + 2000;
@@ -262,23 +322,23 @@ int jugada(int actual, int total, char palabras[][7][6], char todosWordles[][1][
             printf("Tu puntaje final es de %d puntos.\n", puntaje);
             colorReset();
             break;
-        } else
-        {
-            derrota++;
+        } else {
+            derrota++; //Contador de todas las veces que *no* se adivino una palabra
         }
 
-        //Aca el ingreso ya es valido y guardado en intento
-        //Se revisa en las 5 letras del intento si esta bien puesta,
-        //o si esta en cualquier otro lado de la palabra (con un for anidado)
+
         for(j = 0; j < 5; j++)
         {
+            //Se revisa en las 5 letras del intento si esta bien puesta,
+            //o si esta en cualquier otro lado de la palabra (con un for anidado)
+            //(A esta altura se tiene un ingreso validado que NO es el wordle, para analizar)
             comprobante = 0;
             if(wordle[j] == intento[j])
             { //letra correcta en lugar correcto
                 verde();
                 printf("%c", intento[j]);
                 if(punt[j] != 2)
-                {  //controlo que la letra no haya sumado puntos todavia
+                {  //control que la letra no haya sumado puntos todavia
                 puntaje = puntaje + 100;
                 punt[j] = 2;
                 }
@@ -308,9 +368,12 @@ int jugada(int actual, int total, char palabras[][7][6], char todosWordles[][1][
             }
         }
         colorReset();
-        if(derrota == 6){
-            puntaje=0;
+        if(derrota == 6) //No se logro adivinar la palabra luego de 6 intentos.
+        {
+            puntaje = 0; 
+            rojo();
             printf("\n\nPerdiste! Te quedaste sin intentos para adivinar la palabra\n");
+            colorReset();
             printf("Tu puntaje final es: %d puntos\n", puntaje);
             printf("El Wordle era: ");
             verde();
@@ -331,7 +394,6 @@ void mostrarJugada(char todosIntentos[][7][6], char todosWordles[][1][6], int nr
     printf("Tu puntaje en esta ronda fue de %i\n", puntaje);
     printf("Tu Wordle era: "); verde(); printf("%s\n\n", todosWordles[nroJugada][0]); colorReset();
     bufferEnter();
-    bufferEnter();
 }
 
 
@@ -345,17 +407,12 @@ void wordleRandomizer(char wordle[]){
     //n = entero entre 0 y 30, la cantidad de palabras definida en el archivo dado
     int n = (rand() % CANTIDAD_PALABRAS);
 
-    //Multiplataforma, por la cuestion de la barra en el path
-  #if defined(linux) || defined(unix) || defined(APPLE)
     getWordInLine("palabras.txt", n, wordle);
-  #endif
-
-  #if defined(_WIN32) || defined(_WIN64)
-    getWordInLine("palabras.txt", n, wordle);
-  #endif
-
-  wordle[5] = '\0';
+    wordle[5] = '\0';
 }
+
+
+
 
 void getWordInLine(char *fileName, int lineNumber, char *p) {
     FILE * fp;
@@ -379,9 +436,11 @@ void getWordInLine(char *fileName, int lineNumber, char *p) {
 }
 
 
+
 void mensajeNroJugada(int actual, int total){
     printf("Esta es tu jugada %i de %i \nRecorda que...\nVerde = Lugar correcto, Amarillo = Lugar incorrecto, Gris = Letra incorrecta\nCada letra en el wordle es unica y no va a repetirse \n-----\n", actual, total);
 }
+
 
 void verde(){
     printf("\033[0;32m");
@@ -410,6 +469,7 @@ void colorReset(){
 
 
 void limpiarPantalla(){
+    
   #if defined(linux) || defined(unix) || defined(APPLE)
     system("clear");
   #endif
