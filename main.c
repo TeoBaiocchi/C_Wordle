@@ -41,6 +41,7 @@ void getWordInLine(char *fileName, int lineNumber, char *p);
 
 
 int main(){
+
     menuPrincipal();
     printf("Saliste del juego. Presione enter para terminar el programa...");
     bufferEnter();
@@ -76,6 +77,7 @@ void menuPrincipal(){
                 nuevaPartida();
                 limpiarPantalla();
                 menuPrincipal();
+                return;
                 break;
 
             case 2:
@@ -100,6 +102,7 @@ void menuPrincipal(){
                 printf("Barbaro. Suerte!");
                 colorReset();
                 menuPrincipal();
+                break;
 
             case 3:
                 return;
@@ -141,9 +144,9 @@ void nuevaPartida(){
     j2 = j;
 
 
-    for(i = 0; i <= j; i++) 
-    {   //Este for va a ser la sesion de juego. 
-        
+    for(i = 0; i <= j; i++)
+    {   //Este for va a ser la sesion de juego.
+
 
         if(i != 0  && i != j) //Si la jugada NO es ni la primera ni la ultima
         {   //se pregunta al usuario si quiere abandonar la partida
@@ -161,10 +164,12 @@ void nuevaPartida(){
         {   //Cuando la partida termina, ya sea por que termino o porque fue cortada
             //Dentro de este if, se genera toda la pantalla de fin del juego y se
             //llama a las funciones correspondientes
-            
+
             while(1)
             {   //"While" porque se debe poder revisualizar
                 //esta pantalla hasta que se decida volver al menu
+                printf("Presiona enter para continuar...");
+                bufferEnter();
                 limpiarPantalla();
                 negro();
                 printf("Fin del juego...\n");
@@ -200,7 +205,13 @@ void nuevaPartida(){
                         p++;
                     }
                 }
-                prom = sum / p;
+                if(p != 0)
+                {
+                     prom = sum / p;
+                } else {
+                    prom = 0.00;
+                }
+
 
                 verde();
                 printf("Tu puntaje maximo fue de %d puntos y lo obtuviste en la partida %d\n", max, imax);
@@ -233,7 +244,7 @@ void nuevaPartida(){
         } else {
             todosPuntajes[i] = jugada(i, j, todosIntentos, todosWordles);
 
-            //si *no* termino la partida, se efectua la jugada. 
+            //si *no* termino la partida, se efectua la jugada.
             //La jugada recibe los array para almacenar los string pertinentes
             //y devuelve el puntaje de la ronda.
         }
@@ -264,18 +275,18 @@ int jugada(int actual, int total, char palabras[][7][6], char todosWordles[][1][
     //Guardamos el wordle de la ronda en el registro para utilizar mas tarde
     strcpy(todosWordles[actual][0], wordle);
 
-    
-    for(i = 0; i < 6; i++) 
+
+    for(i = 0; i < 6; i++)
     {   //6 = cantidad de intentos permitidos
-        
+
         if(i>0)
         {
             //Restar 500 puntos cada vez que se hace un nuevo intento, excepto en el primer intento
             puntaje = puntaje - 500;
         }
-        
+
         printf("\nTu puntaje es de %d puntos\n", puntaje);
-        
+
         comprobante = 0;
         while(comprobante != 1) //Comprobacion de ingreso valido
         {
@@ -309,10 +320,7 @@ int jugada(int actual, int total, char palabras[][7][6], char todosWordles[][1][
 
         //Símil que "todosWordles". Guardamos los intentos de la sesion para uso posterior
         strcpy(palabras[actual][i], intento);
-        if(actual != 7)
-        {
-            palabras[actual+1][i][0] = '\0';
-        }
+        palabras[actual][i+1][0] = 'a';
 
 
 
@@ -326,7 +334,7 @@ int jugada(int actual, int total, char palabras[][7][6], char todosWordles[][1][
                 puntaje = puntaje + 5000; //Suma de puntos caso de adivinar en primer intento
             } else
             {
-                puntaje = puntaje + 2000; 
+                puntaje = puntaje + 2000;
             }
             verde();
             printf("Adivinaste la palabra!\n");
@@ -402,6 +410,7 @@ int jugada(int actual, int total, char palabras[][7][6], char todosWordles[][1][
 void mostrarJugada(char todosIntentos[][7][6], char todosWordles[][1][6], int nroJugada, int puntaje){
     int i, j, k, comprobante;
     char wordle[6];
+    char intento[6];
 
     strcpy(wordle, todosWordles[nroJugada][0]);
     wordle[5] = '\0';
@@ -419,8 +428,7 @@ void mostrarJugada(char todosIntentos[][7][6], char todosWordles[][1][6], int nr
     for(i = 0; i < 6; i++) // 6 palabras... maximo
     {
         colorReset();
-        char intento[6];
-        if(todosIntentos[nroJugada][i][0] != '\0')
+        if(todosIntentos[nroJugada][i][0] != 'a')
             {
                 strcpy(intento, todosIntentos[nroJugada][i]);
             } //Si no hay un string en este nro de intento, (porque se logro en menos),
@@ -428,7 +436,6 @@ void mostrarJugada(char todosIntentos[][7][6], char todosWordles[][1][6], int nr
             break;
         }
 
-        printf("\n --Wordle-%s, --Intento- %s --- \n", wordle, intento);
 
         for(j = 0; j < 5; j++)
         {   //Reciclamos la funcion de "jugada", sin los elementos de puntaje
@@ -457,8 +464,6 @@ void mostrarJugada(char todosIntentos[][7][6], char todosWordles[][1][6], int nr
     printf("\n");
     }
     colorReset();
-    printf("Presione enter para volver al menu...");
-    bufferEnter();
 }
 
 
@@ -498,7 +503,7 @@ void getWordInLine(char *fileName, int lineNumber, char *p) {
     int i=1;
     while ((read = getline(&line, &len, fp)) != -1) {
         if (i==lineNumber) {
-           printf("%s", line);
+           //printf("%s", line);
            strcpy(p, line);
            return;
         }
