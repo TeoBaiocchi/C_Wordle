@@ -51,16 +51,17 @@ int main(){
 
 void menuPrincipal(){
 
-    int n, invalido = 0;
+    int n, invalido = 0, salirMenu = 0;
 
-    printf("---WORDLE---\nAUS - Taller de programacion I \nBaiocchi Teo, Ceron Santiago");
-    printf("\n\n");
-    printf("1) Jugar una partida\n");
-    printf("2) Reglas del juego\n");
-    printf("3) Salir\n");
 
-    while(1)
+    while(salirMenu == 0)
     {
+        printf("---WORDLE---\nAUS - Taller de programacion I \nBaiocchi Teo, Ceron Santiago");
+        printf("\n\n");
+        printf("1) Jugar una partida\n");
+        printf("2) Reglas del juego\n");
+        printf("3) Salir\n");
+
         if(invalido == 1)
         {
             printf("El numero ingresado no fue valido. Intente nuevamente... \n");
@@ -76,8 +77,6 @@ void menuPrincipal(){
                 invalido = 0;
                 nuevaPartida();
                 limpiarPantalla();
-                menuPrincipal();
-                return;
                 break;
 
             case 2:
@@ -101,17 +100,15 @@ void menuPrincipal(){
                 limpiarPantalla();
                 printf("Barbaro. Suerte!");
                 colorReset();
-                menuPrincipal();
                 break;
 
             case 3:
-                return;
+                salirMenu = 1;
                 break;
 
             default:
                 limpiarPantalla();
                 invalido = 1;
-                menuPrincipal();
                 break;
         }
     }
@@ -321,7 +318,9 @@ int jugada(int actual, int total, char palabras[][7][6], char todosWordles[][1][
         //Símil que "todosWordles". Guardamos los intentos de la sesion para uso posterior
         strcpy(palabras[actual][i], intento);
         palabras[actual][i+1][0] = 'a';
-
+        //La palabra siguiente queda "inhabilitada", hasta que se use en la proxima iteracion
+        //Se chequea luego por este caracter de verificacion en mostrarJugada
+        //(nota: un intento valido esta normalizado a mayusculas y nunca va a empezar por 'a')
 
 
 
@@ -503,7 +502,7 @@ void getWordInLine(char *fileName, int lineNumber, char *p) {
     int i=1;
     while ((read = getline(&line, &len, fp)) != -1) {
         if (i==lineNumber) {
-           //printf("%s", line);
+           printf("%s", line);
            strcpy(p, line);
            return;
         }
